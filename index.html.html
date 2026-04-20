@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes, viewport-fit=cover">
+  <title>春蕾学校 · 教职工编号查询</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', Roboto, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(145deg, #eaf7e1 0%, #c8e6c9 100%);
+      padding: 20px 16px 36px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .main-card {
+      max-width: 720px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 36px;
+      box-shadow: 0 18px 35px -8px rgba(30, 70, 30, 0.2), 0 6px 12px -4px rgba(0, 30, 0, 0.08);
+      padding: 28px 22px 32px;
+      border: 1px solid rgba(110, 160, 90, 0.15);
+      transition: all 0.2s ease;
+    }
+
+    .header {
+      margin-bottom: 28px;
+    }
+
+    .school-title {
+      font-size: 1.85rem;
+      font-weight: 620;
+      letter-spacing: 1px;
+      color: #1e4a2b;
+      line-height: 1.3;
+      text-shadow: 0 2px 6px rgba(50, 100, 40, 0.1);
+    }
+
+    .sub-title {
+      font-size: 1rem;
+      color: #2e6b3e;
+      margin-top: 6px;
+      font-weight: 480;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .total-badge {
+      background: #2e7d32;
+      color: white;
+      padding: 6px 16px;
+      border-radius: 40px;
+      font-size: 0.95rem;
+      font-weight: 540;
+      box-shadow: inset 0 1px 3px rgba(255,255,255,0.3), 0 6px 12px -5px rgba(20,80,20,0.2);
+      margin-left: 4px;
+      display: inline-block;
+      backdrop-filter: blur(4px);
+      border: 1px solid #6da56d;
+    }
+
+    /* 搜索条 + 查询按钮 */
+    .search-container {
+      margin-bottom: 22px;
+    }
+
+    .search-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .search-wrapper {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      background: white;
+      border-radius: 60px;
+      padding: 4px 6px 4px 18px;
+      box-shadow: 0 12px 22px -8px rgba(30, 70, 20, 0.12), 0 2px 6px rgba(0,0,0,0.02);
+      border: 1px solid #bcddb0;
+      transition: box-shadow 0.2s, border-color 0.2s;
+    }
+
+    .search-wrapper:focus-within {
+      border-color: #2e7d32;
+      box-shadow: 0 14px 25px -10px #2e7d3250, 0 0 0 3px rgba(46, 125, 50, 0.15);
+    }
+
+    .search-icon {
+      color: #3e7d4a;
+      font-size: 1.4rem;
+      line-height: 1;
+      margin-right: 8px;
+      opacity: 0.8;
+    }
+
+    .search-input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-size: 1.05rem;
+      padding: 14px 0 14px 0;
+      background: transparent;
+      color: #1c3e1f;
+      font-weight: 460;
+      min-width: 0;
+    }
+
+    .search-input::placeholder {
+      color: #7f9f7a;
+      font-weight: 380;
+      font-size: 0.98rem;
+    }
+
+    .clear-btn {
+      background: none;
+      border: none;
+      width: 44px;
+      height: 44px;
+      border-radius: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      line-height: 1;
+      color: #5a7e55;
+      cursor: pointer;
+      transition: all 0.15s;
+      margin-left: 4px;
+      opacity: 0.7;
+      flex-shrink: 0;
+    }
+
+    .clear-btn:hover {
+      background: #e8f3e2;
+      opacity: 1;
+      color: #1f4a1f;
+    }
+
+    .search-btn {
+      background: #2e7d32;
+      border: none;
+      border-radius: 48px;
+      padding: 0 24px;
+      height: 52px;
+      font-size: 1.1rem;
+      font-weight: 560;
+      color: white;
+      box-shadow: 0 8px 16px -6px #1b4b1b;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #7fb07f;
+      transition: 0.15s;
+      white-space: nowrap;
+    }
+
+    .search-btn:hover {
+      background: #1f5a23;
+      box-shadow: 0 6px 12px -4px #1e4a1e;
+    }
+
+    .search-btn:active {
+      transform: scale(0.96);
+    }
+
+    /* 结果状态栏 */
+    .result-status {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 14px;
+      padding: 0 8px;
+    }
+
+    .match-count {
+      background: #e1f0da;
+      color: #1d4e1d;
+      padding: 6px 18px;
+      border-radius: 36px;
+      font-size: 0.95rem;
+      font-weight: 520;
+      box-shadow: inset 0 1px 4px white, 0 4px 8px -4px rgba(30,70,20,0.1);
+      border: 1px solid #bcddb0;
+    }
+
+    .hint-esc {
+      color: #427e42;
+      font-size: 0.8rem;
+      opacity: 0.75;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .hint-esc kbd {
+      background: #f1f9ec;
+      border-radius: 8px;
+      padding: 3px 8px;
+      font-size: 0.75rem;
+      border: 1px solid #aacf9e;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+      color: #235a23;
+    }
+
+    /* 卡片列表区域 */
+    .list-container {
+      min-height: 280px;
+      max-height: 540px;
+      overflow-y: auto;
+      padding-right: 4px;
+      scrollbar-width: thin;
+      scrollbar-color: #9fca9a #e2f0da;
+    }
+
+    .list-container::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .list-container::-webkit-scrollbar-track {
+      background: #e2f0da;
+      border-radius: 10px;
+    }
+
+    .list-container::-webkit-scrollbar-thumb {
+      background: #9fca9a;
+      border-radius: 10px;
+    }
+
+    .teacher-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-radius: 28px;
+      padding: 16px 22px;
+      margin-bottom: 12px;
+      border: 1px solid #d4e8ca;
+      box-shadow: 0 6px 12px -6px rgba(30, 60, 20, 0.08);
+      transition: transform 0.1s, background 0.2s;
+    }
+
+    .teacher-card:hover {
+      background: rgba(255, 255, 255, 0.9);
+      border-color: #a7ca9a;
+    }
+
+    .teacher-name {
+      font-size: 1.25rem;
+      font-weight: 560;
+      color: #1d3f1a;
+      letter-spacing: 0.3px;
+    }
+
+    .code-badge {
+      background: #2e7d32;
+      color: white;
+      padding: 8px 18px;
+      border-radius: 48px;
+      font-size: 1.15rem;
+      font-weight: 550;
+      letter-spacing: 0.8px;
+      box-shadow: inset 0 1px 4px #a5d6a5, 0 6px 10px -4px #1b4b4b80;
+      border: 1px solid #7fb07f;
+      backdrop-filter: blur(2px);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .empty-message {
+      text-align: center;
+      padding: 48px 20px;
+      background: #f4fbf0;
+      border-radius: 38px;
+      color: #3b6e3b;
+      font-size: 1.1rem;
+      border: 1.5px dashed #9fc99b;
+      margin-top: 8px;
+    }
+
+    .empty-icon {
+      font-size: 2.8rem;
+      margin-bottom: 12px;
+      opacity: 0.65;
+    }
+
+    .footer-note {
+      margin-top: 22px;
+      text-align: center;
+      color: #3f7840;
+      font-size: 0.8rem;
+      opacity: 0.8;
+    }
+
+    /* 移动端调整 */
+    @media (max-width: 480px) {
+      .main-card {
+        padding: 20px 16px 24px;
+      }
+      .school-title {
+        font-size: 1.6rem;
+      }
+      .teacher-name {
+        font-size: 1.1rem;
+      }
+      .code-badge {
+        padding: 6px 14px;
+        font-size: 1rem;
+      }
+      .search-input {
+        font-size: 1rem;
+      }
+      .search-btn {
+        padding: 0 16px;
+        height: 48px;
+        font-size: 1rem;
+      }
+      .search-row {
+        gap: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="main-card">
+  <div class="header">
+    <div class="school-title">深圳市光明区春蕾学校</div>
+    <div class="sub-title">
+      <span>🌱 光明区教职工心理健康调研 · 编号查询</span>
+      <span class="total-badge" id="totalTeachersDisplay">82 位教职工</span>
+    </div>
+  </div>
+
+  <!-- 搜索区域：输入框 + 清空 + 查询按钮 -->
+  <div class="search-container">
+    <div class="search-row">
+      <div class="search-wrapper">
+        <span class="search-icon" aria-hidden="true">🔍</span>
+        <input type="text" id="searchInput" class="search-input" placeholder="输入教职工姓名" autocomplete="off" aria-label="按姓名搜索教职工">
+        <button class="clear-btn" id="clearSearchBtn" aria-label="清空搜索" title="清空输入框">✕</button>
+      </div>
+      <button class="search-btn" id="searchBtn">查询</button>
+    </div>
+  </div>
+
+  <!-- 状态栏：匹配数量 + Esc提示 -->
+  <div class="result-status">
+    <div class="match-count" id="matchCountDisplay">未进行查询</div>
+    <div class="hint-esc">
+      <kbd>Esc</kbd> 清空
+    </div>
+  </div>
+
+  <!-- 教职工列表渲染区 (初始为空) -->
+  <div class="list-container" id="listContainer">
+    <div class="empty-message">
+      <div class="empty-icon">🌱</div>
+      <div>请输入姓名并点击“查询”</div>
+      <div style="font-size:0.9rem; margin-top:10px; opacity:0.7;">支持模糊匹配，不区分大小写</div>
+    </div>
+  </div>
+  <div class="footer-note">
+    🌟 共收录82位教职工 · 编号与姓名一一对应
+  </div>
+</div>
+
+<script>
+  (function(){
+    "use strict";
+
+    // ---------- 82条完整数据 (姓名 + 个人编码) ----------
+    const TEACHERS = [
+      { name: "邹丽萍", code: "M12001" },
+      { name: "蒋群妹", code: "M12002" },
+      { name: "罗惠丹", code: "M12003" },
+      { name: "段小黎", code: "M12004" },
+      { name: "钟淑华", code: "M12005" },
+      { name: "韩燕红", code: "M12006" },
+      { name: "黄燕", code: "M12007" },
+      { name: "张月凤", code: "M12008" },
+      { name: "袁龙苑", code: "M12009" },
+      { name: "卢敏仪", code: "M12010" },
+      { name: "刘安然", code: "M12011" },
+      { name: "杨高凤", code: "M12012" },
+      { name: "刘小燕", code: "M12013" },
+      { name: "徐娟", code: "M12014" },
+      { name: "李梓萌", code: "M12015" },
+      { name: "邹进风", code: "M12016" },
+      { name: "杜天生", code: "M12017" },
+      { name: "梁姬", code: "M12018" },
+      { name: "陈金华", code: "M12019" },
+      { name: "严雪梅", code: "M12020" },
+      { name: "曾崧玲", code: "M12021" },
+      { name: "彭依婷", code: "M12022" },
+      { name: "林恬企", code: "M12023" },
+      { name: "朱晓静", code: "M12024" },
+      { name: "訚朝良", code: "M12025" },
+      { name: "吴小娟", code: "M12026" },
+      { name: "黄钰珍", code: "M12027" },
+      { name: "苏灿枝", code: "M12028" },
+      { name: "刘银春", code: "M12029" },
+      { name: "何健", code: "M12030" },
+      { name: "苏慧君", code: "M12031" },
+      { name: "李芳圆", code: "M12032" },
+      { name: "熊燕", code: "M12033" },
+      { name: "江城娟", code: "M12034" },
+      { name: "盛俊龙", code: "M12035" },
+      { name: "熊敏", code: "M12036" },
+      { name: "张杏", code: "M12037" },
+      { name: "朱容", code: "M12038" },
+      { name: "余远浩", code: "M12039" },
+      { name: "张玲玲", code: "M12040" },
+      { name: "黄丽娥", code: "M12041" },
+      { name: "黄湘娅", code: "M12042" },
+      { name: "张小妹", code: "M12043" },
+      { name: "廖文玉", code: "M12044" },
+      { name: "张一珂", code: "M12045" },
+      { name: "曹俐珉", code: "M12046" },
+      { name: "张婷", code: "M12047" },
+      { name: "杨楠", code: "M12048" },
+      { name: "严泽姣", code: "M12049" },
+      { name: "肖娟", code: "M12050" },
+      { name: "张春", code: "M12051" },
+      { name: "彭飞来", code: "M12052" },
+      { name: "陈家豪", code: "M12053" },
+      { name: "李芳", code: "M12054" },
+      { name: "王丹", code: "M12055" },
+      { name: "周金红", code: "M12056" },
+      { name: "陈宏春", code: "M12057" },
+      { name: "陈建南", code: "M12058" },
+      { name: "徐华小", code: "M12059" },
+      { name: "杨思荣", code: "M12060" },
+      { name: "陈杭圳", code: "M12061" },
+      { name: "傅奕董", code: "M12062" },
+      { name: "邬广辉", code: "M12063" },
+      { name: "谢静思", code: "M12064" },
+      { name: "高兴群", code: "M12065" },
+      { name: "杨惠", code: "M12066" },
+      { name: "张训平", code: "M12067" },
+      { name: "肖晶晶", code: "M12068" },
+      { name: "曹继磊", code: "M12069" },
+      { name: "肖华", code: "M12070" },
+      { name: "高友容", code: "M12071" },
+      { name: "廖红菊", code: "M12072" },
+      { name: "黄敏", code: "M12073" },
+      { name: "陈思柔", code: "M12074" },
+      { name: "陈胜火", code: "M12075" },
+      { name: "胡秀金", code: "M12076" },
+      { name: "李秀珍", code: "M12077" },
+      { name: "王小琴", code: "M12078" },
+      { name: "丁礼波", code: "M12079" },
+      { name: "王素园", code: "M12080" },
+      { name: "温丽娟", code: "M12081" },
+      { name: "张浩然", code: "M12082" }
+    ];
+
+    const TOTAL_COUNT = TEACHERS.length;
+    document.getElementById('totalTeachersDisplay').textContent = `${TOTAL_COUNT} 位教职工`;
+
+    // DOM 元素
+    const searchInput = document.getElementById('searchInput');
+    const clearBtn = document.getElementById('clearSearchBtn');
+    const searchBtn = document.getElementById('searchBtn');
+    const listContainer = document.getElementById('listContainer');
+    const matchCountDisplay = document.getElementById('matchCountDisplay');
+
+    // ---------- 渲染函数：根据过滤后的数组绘制卡片 ----------
+    function renderTeacherList(filteredArray, hasSearched = false) {
+      const count = filteredArray.length;
+      const searchTerm = searchInput.value.trim();
+
+      if (!hasSearched) {
+        matchCountDisplay.textContent = `未进行查询`;
+      } else if (searchTerm === '') {
+        matchCountDisplay.textContent = `请输入姓名`;
+      } else {
+        matchCountDisplay.textContent = `匹配 ${count} 位教职工`;
+      }
+
+      if (count === 0) {
+        let emptyText = '未找到匹配的教职工';
+        if (!hasSearched) {
+          emptyText = '请输入姓名并点击“查询”';
+        } else if (searchTerm === '') {
+          emptyText = '请输入姓名';
+        }
+        listContainer.innerHTML = `
+          <div class="empty-message">
+            <div class="empty-icon">🌿</div>
+            <div>${emptyText}</div>
+            <div style="font-size:0.9rem; margin-top:10px; opacity:0.7;">${!hasSearched ? '支持模糊匹配，不区分大小写' : '试试其他姓名'}</div>
+          </div>
+        `;
+        return;
+      }
+
+      let htmlString = '';
+      filteredArray.forEach(person => {
+        htmlString += `
+          <div class="teacher-card">
+            <span class="teacher-name">${escapeHtml(person.name)}</span>
+            <span class="code-badge">${escapeHtml(person.code)}</span>
+          </div>
+        `;
+      });
+      listContainer.innerHTML = htmlString;
+    }
+
+    function escapeHtml(text) {
+      if (!text) return text;
+      const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+      };
+      return String(text).replace(/[&<>"']/g, m => map[m]);
+    }
+
+    function filterByName(term) {
+      if (!term) return [];
+      const lowerTerm = term.toLowerCase();
+      return TEACHERS.filter(t => t.name.toLowerCase().includes(lowerTerm));
+    }
+
+    function performSearch() {
+      const rawTerm = searchInput.value.trim();
+      if (rawTerm === '') {
+        renderTeacherList([], true);
+        return;
+      }
+      const filtered = filterByName(rawTerm);
+      renderTeacherList(filtered, true);
+    }
+
+    function resetToInitial() {
+      searchInput.value = '';
+      renderTeacherList([], false);
+      searchInput.focus();
+    }
+
+    // 事件绑定
+    searchBtn.addEventListener('click', performSearch);
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        performSearch();
+      }
+    });
+    clearBtn.addEventListener('click', resetToInitial);
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        if (searchInput.value !== '' || listContainer.innerHTML.includes('teacher-card')) {
+          e.preventDefault();
+          resetToInitial();
+        } else {
+          searchInput.focus();
+        }
+      }
+    });
+
+    // 初始化：空白引导状态
+    (function initialize() {
+      searchInput.value = '';
+      renderTeacherList([], false);
+    })();
+
+  })();
+</script>
+</body>
+</html>
